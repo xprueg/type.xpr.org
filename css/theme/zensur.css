@@ -1,0 +1,75 @@
+html[data-theme=zensur] {
+
+/*
+@font-face {
+    font-family: ABC Social;
+    src: url("/fonts/social/ABCSocialCyrillicExtended-Book-Trial.woff2") format("woff2");
+}
+*/
+
+/* BACKGROUND */
+
+body {
+    background: white;
+}
+
+/* LOADER */
+
+#LoaderNode {
+    --frames: "\E013\E014\E015\E014";
+    --delayMs: 512;
+    font-family: GT America;
+    font-size: calc(var(--font-base) * 5);
+}
+
+/* TYPER */
+
+.typer_container {
+    width: 100%;
+    align-self: flex-start;
+    font-size: calc(var(--font-base) * 3.5);
+    margin: 1em;
+    row-gap: .3em;
+    font-family: GT America;
+}
+
+.typer_content {
+    row-gap: .4em;
+}
+
+.typer_caret {
+    background: black;
+    position: absolute;
+    top: -.5ex;
+    bottom: -.5ex;
+    left: -1px;
+    right: -1px;
+}
+
+/* TYPER SEGMENTS */
+
+.segment_pair_last_in_line { color: red; }
+.segment_pair_first_in_line { color: blue; }
+
+.typer_content > span:nth-child(2 of .segment_pair_last_in_line:not(:has(.segment_hidden))) ~ * {
+    opacity: .3;
+}
+
+.segment_hidden {
+    display: none;
+}
+
+.segment  {
+    &:not(.whitespace) .segment_ok {
+        color: transparent;
+        background: black;
+    }
+
+    .segment_err {
+        background: red;
+        color: white;
+        transform: skewY(-6deg);
+        transform-origin: bottom left;
+    }
+}
+}

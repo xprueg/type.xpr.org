@@ -1,0 +1,49 @@
+.segment_pair, .segment {
+    display: inline-flex;
+    line-height: 1;
+    position: relative;
+}
+
+.segment > span {
+    display: inline-flex;
+    line-height: 1;
+}
+
+.segment > span > span {
+    text-box-trim: both;
+    text-box-trim: trim-both;
+    text-box-edge: cap alphabetic;
+    white-space: pre;
+}
+
+.segment::before {
+    content: attr(data-text);
+    text-box-trim: both;
+    text-box-edge: cap alphabetic;
+    opacity: 0;
+    white-space: pre;
+}
+
+.segment_live {
+    position: absolute;
+}
+
+.segment_ok {
+    position: absolute;
+}
+
+.segment_fut {
+    position: absolute;
+    right: 0;
+}
+
+.segment_input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+}
+
+.segment_err {
+    position: relative;
+    z-index: 128;
+}

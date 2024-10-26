@@ -1,0 +1,40 @@
+#RelatedItems {
+    --color: black;
+    --font-family: Articulat;
+    --font-size: calc(1vw * 4);
+
+    #related_items_header {
+        font-size: .4em;
+        text-box-trim: both;
+        text-box-trim: trim-both;
+        text-box-edge: cap alphabetic;
+        color: var(--color);
+    }
+
+    font-size: var(--font-size);
+    font-family: var(--font-family);
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: .2em;
+    text-transform: uppercase;
+    color: var(--color);
+
+    & input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    & label {
+        position: relative;
+        text-box-trim: both;
+        text-box-trim: trim-both;
+        text-box-edge: cap alphabetic;
+        -webkit-text-stroke: 1px var(--color);
+
+        &:not(:has(:focus)) {
+            color: transparent;
+        }
+    }
+}

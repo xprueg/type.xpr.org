@@ -1,0 +1,21 @@
+.typer_frame {
+    position: relative;
+    display: grid;
+}
+
+.typer_content {
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    line-height: 0;
+    grid-column-start: 1;
+    grid-row-start: 1;
+}
+
+.typer_caret_frame {
+    position: fixed;
+}
+
+.typer_empty, .typer_done {
+    display: none;
+}

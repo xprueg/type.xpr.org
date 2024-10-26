@@ -1,0 +1,211 @@
+html[data-theme=alpha] {
+
+/* BACKGROUND */
+
+body {
+    background:
+        linear-gradient(
+            45deg,
+            hsla(0, 0%, 0%, 0.04) 25%, transparent 25%, transparent 75%, hsla(0, 0%, 0%, 0.04) 75%, hsla(0, 0%, 0%, 0.04))
+            50% 50%/50px 50px,
+        linear-gradient(
+            45deg, 
+            hsla(0, 0%, 0%, 0.04) 25%, transparent 25%, transparent 75%, hsla(0, 0%, 0%, 0.04) 75%, hsla(0, 0%, 0%, 0.04))
+            calc(50% + 50px / 2) calc(50% + 50px / 2)/50px 50px,
+        radial-gradient(at 0% 0%, white, white)
+    ;
+}
+
+/* LOADER */
+
+#LoaderNode {
+    --frames: "+-";
+    font-family: Cartograph;
+    font-size: calc(var(--font-base) * 5);
+}
+
+/* TYPER */
+
+.typer_container {
+    font-size: calc(var(--font-base) * 3.5);
+    width: 100%;
+    max-height: 100%;
+    position: relative;
+    padding: calc(var(--font-base) * 3.5);
+    box-sizing: border-box;
+    justify-items: center;
+    align-self: flex-start;
+    display: flex;
+    min-height: 0;
+
+    &.typer_empty, &.typer_done {
+        display: none;
+    }
+}
+
+.typer_frame {
+    padding: calc(var(--font-base) * 3.5);
+    position: relative;
+    box-sizing: border-box;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+.typer_content {
+    row-gap: .5em;
+}
+
+/* FRAME */
+
+.typer_container::before {
+    position: absolute;
+    content: "";
+    --w: 100%;
+    --h: 100%;
+    --anchor-size: 10px;
+    --anchor-padding: 2px;
+    --inner-anchor-size: calc(var(--anchor-size) - var(--anchor-padding) * 2);
+    --thickness: 2px;
+    --half-thickness: calc(var(--thickness) / 2);
+    --half: calc((var(--s) + var(--l)) / 2);
+    --ww: calc(var(--w) - var(--s) * 2);
+    --offset: calc(var(--anchor-size) / 2);
+
+    z-index: 1;
+
+    top: calc(var(--font-base) * 3.5 + var(--offset) * -1);
+    left: calc(var(--font-base) * 3.5 + var(--offset) * -1);
+    right: calc(var(--font-base) * 3.5 + var(--offset) * -1);
+    bottom: calc(var(--font-base) * 3.5 + var(--offset) * -1);
+
+    background:
+        /* TOP INNER ANCHORS */
+        linear-gradient(90deg,
+            /* LEFT */
+            transparent var(--anchor-padding),  
+            white var(--anchor-padding),
+            white calc(var(--anchor-padding) + var(--inner-anchor-size)),
+
+            /* GAP */
+            transparent calc(var(--anchor-padding) + var(--inner-anchor-size)), transparent calc(var(--w) - var(--anchor-size) + var(--anchor-padding)),
+
+            /* RIGHT */
+            white calc(var(--w) - var(--anchor-size) + var(--anchor-padding)),
+            white calc(var(--w) - var(--anchor-size) + var(--inner-anchor-size) + var(--anchor-padding)),
+            transparent calc(var(--w) - var(--anchor-size) + var(--inner-anchor-size) + var(--anchor-padding))
+        ) 0 var(--anchor-padding)/var(--w) var(--inner-anchor-size) no-repeat,
+
+        /* TOP OUTER ANCHORS */
+        linear-gradient(90deg,
+            /* LEFT */
+            black var(--anchor-size),
+
+            /* GAP */
+            transparent var(--anchor-size), transparent calc(var(--w) - var(--anchor-size)),
+
+            /* RIGHT */
+            black calc(var(--w) - var(--anchor-size))
+        ) 0 0/var(--w) var(--anchor-size) no-repeat,
+
+        /* BOTTOM INNER ANCHORS */
+        linear-gradient(90deg,
+            /* LEFT */
+            transparent var(--anchor-padding),  
+            white var(--anchor-padding),
+            white calc(var(--anchor-padding) + var(--inner-anchor-size)),
+
+            /* GAP */
+            transparent calc(var(--anchor-padding) + var(--inner-anchor-size)), transparent calc(var(--w) - var(--anchor-size) + var(--anchor-padding)),
+
+            /* RIGHT */
+            white calc(var(--w) - var(--anchor-size) + var(--anchor-padding)),
+            white calc(var(--w) - var(--anchor-size) + var(--inner-anchor-size) + var(--anchor-padding)),
+            transparent calc(var(--w) - var(--anchor-size) + var(--inner-anchor-size) + var(--anchor-padding))
+        ) 0 calc(100% - var(--anchor-padding))/var(--w) var(--inner-anchor-size) no-repeat,
+
+        /* BOTTOM OUTER ANCHORS */
+        linear-gradient(90deg,
+            /* LEFT */
+            black var(--anchor-size),
+
+            /* GAP */
+            transparent var(--anchor-size), transparent calc(var(--w) - var(--anchor-size)),
+
+            /* RIGHT */
+            black calc(var(--w) - var(--anchor-size))
+        ) 0 100%/var(--w) var(--anchor-size) no-repeat,
+
+        /* TOP LINE */  
+        linear-gradient(
+            black, black
+        ) 0 calc(var(--offset) - var(--half-thickness))/var(--w) var(--thickness) no-repeat,
+
+        /* RIGHT LINE */  
+        linear-gradient(
+            black, black
+        ) calc(100% - var(--offset) + var(--half-thickness)) calc(100% - var(--offset) + var(--half-thickness))/var(--thickness) var(--h) no-repeat,
+
+        /* BOTTOM LINE */  
+        linear-gradient(
+            black, black
+        ) 0 calc(100% - var(--offset) + var(--half-thickness))/var(--w) var(--thickness) no-repeat,
+
+        /* LEFT LINE */  
+        linear-gradient(
+            black, black
+        ) calc(var(--offset) - var(--half-thickness)) calc(100% - var(--offset) + var(--half-thickness))/var(--thickness) var(--h) no-repeat
+    ;
+}   
+
+/* TYPER SEGMENTS */
+
+.segment_hidden {
+    display: none;
+}
+
+.segment  {
+    font-family: "Cartograph";
+
+    .segment_ok {
+        color: #efefef;
+    }
+
+    &.segment_active {
+        .segment_err:not(:empty) {
+            color: red;
+
+            &::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                width: 100%;
+                top: -.2em;
+                height: .3em;
+                box-shadow:
+                    inset 2px 0 0 0 red,
+                    inset -2px 0 0 0 red,
+                    inset 0 2px 0 0 red
+                ;
+            }
+        }
+
+        .segment_live:has(.segment_err:not(:empty)) + .segment_auto .segment_fut {
+            color: transparent;
+        }
+
+        .segment_fut::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            width: 100%;
+            bottom: -.2em;
+            height: .3em;
+            box-shadow:
+                inset 2px 0 0 0 black,
+                inset -2px 0 0 0 black,
+                inset 0 -2px 0 0 black
+            ;
+        }
+    }
+}
+}

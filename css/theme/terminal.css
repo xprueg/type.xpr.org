@@ -1,0 +1,166 @@
+html[data-theme=terminal] {
+    /* BACKGROUND */
+
+    body {
+        --bright: hsl(83, 97%, 58%);
+        --dark: hsl(80, 55%, 8%);
+        --cW: 200px;
+        --cH: 100px;
+        --cC: hsl(83, 97%, 20%);
+
+        background:
+            linear-gradient(-26.5deg,
+                transparent, transparent calc(50% - 1px), var(--cC) 50%,
+                transparent calc(50% + 1px), transparent
+            ) 0 0/calc(var(--cW) * 2) var(--cH),
+
+            linear-gradient(-26.5deg,
+                transparent, transparent calc(50% - 1px), var(--cC) 50%,
+                transparent calc(50% + 1px), transparent
+            ) 0 0/var(--cW) var(--cH),
+
+            linear-gradient(var(--cC) 1px, transparent 1px)
+                0 0/var(--cW) var(--cH),
+
+            linear-gradient(90deg,
+                var(--cC) 1px, transparent 1px)
+                0 0/var(--cW) var(--cH),
+
+            radial-gradient(circle at center center,
+               var(--dark), transparent),
+
+            hsl(80, 35%, 8%)
+        ;
+    }
+
+    /* MENU */
+
+    nav {
+        mix-blend-mode: unset;
+        background: color(srgb 0.0925 0.1146 0.0455);
+        box-shadow: 0 1px 0 0 color(srgb 0.2471 0.3921 0.0086);
+    }
+
+
+    /* LOADER */
+
+    #LoaderNode {
+        --frames: "/ LOADING /, ";
+        --split: ",";
+        --delayms: 512;
+        font-family: Cordata;
+        font-size: calc(var(--font-base) * 3);
+        color: var(--bright);
+    }
+
+    /* TYPER */
+
+    .typer_container {
+        -webkit-font-smoothing: antialiased;
+        font-size: calc(var(--font-base) * 3);
+        width: 100%;
+        max-height: 100%;
+        position: relative;
+        padding: calc(var(--font-base) * 3.5);
+        box-sizing: border-box;
+        justify-items: center;
+        align-self: flex-start;
+        display: flex;
+        min-height: 0;
+
+        &.typer_empty, &.typer_done {
+            display: none;
+        }
+    }
+
+    .typer_frame {
+        position: relative;
+        box-sizing: border-box;
+        max-height: 100%;
+        overflow: hidden;
+    }
+
+    .typer_content {
+    }
+
+    /* TYPER SEGMENTS */
+
+    .segment_hidden {
+        display: none;
+    }
+
+    .segment  {
+        --padding: .23em 0;
+        font-family: Cordata;
+
+        &::before, & > span > span {
+            padding: var(--padding);
+        }
+
+        .segment_ok {
+            background:
+                linear-gradient(var(--dark), var(--dark))
+                    0 100%/100% 50% no-repeat,
+                linear-gradient(transparent, transparent)
+                    0 0/100% 100% no-repeat
+            ;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        &:not(.segment_finished) .segment_ok::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            background:
+                linear-gradient(var(--bright), var(--bright))
+                    0 100%/100% 50% no-repeat,
+                linear-gradient(transparent, transparent)
+                    0 0/100% 100% no-repeat
+            ;
+        }
+
+        &.segment_finished {
+            .segment_ok {
+                color: transparent;
+                background: none;
+            }
+        }
+
+        &.segment_pending {
+            background: var(--bright);
+        }
+
+        &.segment_active {
+            .segment_err {
+                background: color(srgb 0 0.0207 1);
+                transform: skew(14deg);
+                color: white;
+            }
+
+        }
+
+        &.segment_active .segment_fut {
+            background: var(--bright);
+
+            .segment_live:has(.segment_err:not(:empty)) + .segment_auto .segment_fut {
+                color: transparent;
+            }
+        }
+    }
+
+    nav {
+        --font-family: Cordata;
+        --color: var(--bright);
+    }
+
+    #RelatedItems {
+        --color: var(--bright);
+        --font-family: Cordata;
+    }
+}

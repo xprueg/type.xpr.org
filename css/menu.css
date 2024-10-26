@@ -1,0 +1,100 @@
+/*
+@font-face {
+    font-family: ABC Social;
+    src: url("/fonts/social/ABCSocialCyrillicExtended-Book-Trial.woff2") format("woff2");
+}
+*/
+
+@font-face {
+    font-family: Articulat;
+    font-style: normal;
+    font-weight: normal;
+    src: url("/fonts/articulat/ArticulatCF-Normal.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: Articulat;
+    font-style: normal;
+    font-weight: bold;
+    src: url("/fonts/articulat/ArticulatCF-Bold.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: Articulat;
+    font-style: italic;
+    font-weight: normal;
+    src: url("/fonts/articulat/ArticulatCF-NormalOblique.woff2") format("woff2");
+}
+
+.esc {
+    font-size: .5em;
+    text-transform: lowercase;
+    padding-left: .9ex;
+}
+
+nav {
+    --font-family: Articulat;
+    --color: white;
+
+    z-index: 1;
+    font-size: calc(var(--font-base) * 2);
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--font-base) * 1);
+    text-transform: uppercase;
+    color: var(--color);
+    mix-blend-mode: difference;
+
+    * {
+        font-family: var(--font-family);
+    }
+
+    & > *:not(:last-child) {
+        display: none;
+    }
+
+    li:has(span) {
+        display: flex;
+
+        & span {
+            text-box-trim: both;
+            text-box-trim: trim-both;
+            text-box-edge: cap alphabetic;
+        }
+    }
+
+    li:not(:has(span)), & label {
+        text-box-trim: both;
+        text-box-trim: trim-both;
+        text-box-edge: cap alphabetic;
+
+        sub {
+            font-size: .5em;
+            text-transform: lowercase;
+        }
+    }
+
+    menu {
+        list-style-type: none;
+        display: inline-flex;
+        justify-content: space-between;
+    }
+
+    form {
+        display: inline-flex;
+        gap: 15px;
+
+        label {
+            input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+        }
+
+        &:last-of-type label:has(:checked) { 
+            text-decoration: underline;
+            text-decoration-thickness: calc(var(--rem) * .4);
+        }
+    }
+}
