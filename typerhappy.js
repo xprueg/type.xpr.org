@@ -28,8 +28,24 @@ void new class Typerhappy {
         // FIXME Hide UI while theme is still loading, but start loading right away.
         this.themes.loaded.then(() => {});
 
-        // TODO Check which source accepts the string and change sources if needed
-        this.loadRandomItem(location.hash?.substring(1));
+        const hash = location.hash;
+        if (hash.length) {
+            // FIXME Add error handling
+            const url = new URL(hash.substring(1));
+            const source = this.sources.acceptUrl(url);
+
+            if (source) {
+                this.LoadingSpinner.showWhile(async () => {
+                    const item = await this.sources.activeItem.fetchUrl(url);
+                    this.current_item = item;
+                    this.typer.set_text(this.current_item.textSanitized);
+                });
+            } else {
+                this.loadRandomItem();
+            }
+        } else {
+            this.loadRandomItem();
+        }
     }
 
     addListener() {
@@ -77,9 +93,9 @@ void new class Typerhappy {
         this.shortcuts.addEventListener("skipSegment", () => this.typer.skipSegment());
     }
 
-    async loadRandomItem(seed = false) {
+    async loadRandomItem() {
         this.LoadingSpinner.showWhile(async () => {
-            const random_item = await this.sources.activeItem.random(seed);
+            const random_item = await this.sources.activeItem.random();
             this.current_item = random_item;
 
             this.typer.set_text(this.current_item.textSanitized);

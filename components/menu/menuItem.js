@@ -1,6 +1,11 @@
 export default class MenuItem extends EventTarget {
     onChange(key) {
+        this.setActiveItem(key);
+    }
+
+    setActiveItem(key) {
         localStorage.setItem(this.key, key);
+        this.dispatchEvent(new Event("change"));
     }
 
     get activeItem() {

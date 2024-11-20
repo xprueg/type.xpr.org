@@ -30,6 +30,11 @@ export default class Wikipedia extends MenuItem {
         }),
     };
 
+    acceptUrl(url) {
+        // TODO
+        return false;
+    }
+
     async random(article_url) {
         let url = `https://${this.activeItem.key}.wikipedia.org/api/rest_v1/page/random/summary`;
         if (article_url) {

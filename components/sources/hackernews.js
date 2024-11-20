@@ -10,6 +10,10 @@ export default class Hackernews extends MenuItem {
         { key: "comment", name: "Comment" },
     ];
 
+    toString() {
+        return `${this.name} (${this.activeItem.name})`;
+    }
+
     #maxId = false;
 
     async _get_random_id() {
@@ -19,6 +23,14 @@ export default class Hackernews extends MenuItem {
         }
 
         return Math.floor(Math.random() * this.#maxId);
+    }
+
+    acceptUrl(url) {
+        if (url.hostname !== "news.ycombinator.com")
+            return false;
+        if (url.searchParams.get("id") === null)
+            return false;
+        return true;
     }
 
     async random(url) {
@@ -36,6 +48,10 @@ export default class Hackernews extends MenuItem {
             return this.random();
 
         return item;
+    }
+
+    async fetchUrl(url) {
+        return this.random(url.toString());
     }
 
     async fetch({ id }) {

@@ -15,6 +15,7 @@ export default class Menu extends MenuItem {
 
         this.target = target
         this.menu.items = items;
+        this.menu.items.forEach(item => item.addEventListener("change", e => this.updateStatus()));
 
         this.render();
         this.updateStatus();
@@ -74,7 +75,6 @@ export default class Menu extends MenuItem {
     deactivate() {
         document.activeElement.blur();
         while (this.stack.length !== 0) this.popMenu();
-        this.updateStatus();
     }
 
     handleKeydown(evt) {
