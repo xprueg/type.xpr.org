@@ -8,12 +8,13 @@ export default class SourceMenu extends MenuItem {
 
     items = [ Wikipedia, Hackernews ].map(source => new source());
 
-    acceptUrl(url) {
+    maybeLoadUrl(url) {
         for (const source of this.items) {
-            if (source.acceptUrl(url)) {
-                this.setActiveItem(source.key);
-                return source.key;
-            }
+            if (!source.acceptUrl(url))
+                continue;
+
+            this.setActiveItem(source.key);
+            return source.fetchUrl(url);
         }
         return false;
     }

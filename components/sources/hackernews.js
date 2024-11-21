@@ -26,9 +26,10 @@ export default class Hackernews extends MenuItem {
     }
 
     acceptUrl(url) {
-        if (url.hostname !== "news.ycombinator.com")
+        const u = new URL(url);
+        if (u.hostname !== "news.ycombinator.com")
             return false;
-        if (url.searchParams.get("id") === null)
+        if (u.searchParams.get("id") === null)
             return false;
         return true;
     }

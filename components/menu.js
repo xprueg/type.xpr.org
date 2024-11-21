@@ -15,7 +15,19 @@ export default class Menu extends MenuItem {
 
         this.target = target
         this.menu.items = items;
-        this.menu.items.forEach(item => item.addEventListener("change", e => this.updateStatus()));
+
+        // FIXME Events should bubble from inner menu items somehow
+        const listen = base => {
+            if (Object.hasOwn(base, "items") === false)
+                return;
+
+            for (const item of base.items) {
+                if (item instanceof EventTarget)
+                    item.addEventListener("change", e => this.updateStatus());
+                listen(item);
+            }
+        };
+        listen(this.menu);
 
         this.render();
         this.updateStatus();

@@ -31,8 +31,13 @@ export default class Wikipedia extends MenuItem {
     };
 
     acceptUrl(url) {
-        // TODO
-        return false;
+        return new RegExp(String.raw`https://[a-z]{2}.wikipedia.org/wiki/.+`).test(url);
+    }
+
+    async fetchUrl(url) {
+        const u = new URL(url);
+        this.setActiveItem(u.hostname.substr(0, 2));
+        return this.random(url);
     }
 
     async random(article_url) {
