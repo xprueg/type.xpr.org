@@ -115,6 +115,12 @@ export default class Typer extends EventTarget {
         `;
     }
 
+    forceFinish() {
+        this.segments.splice(0).forEach(segment => segment.disable());
+        this.node.classList.add("typer_done")
+        this.dispatchEvent(new CustomEvent("done"));
+    }
+
     clear() {
         this.segments.splice(0).forEach(segment => segment.disable());
         this.node.classList.add("typer_empty");

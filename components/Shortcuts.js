@@ -12,6 +12,9 @@ export default class Shortcuts extends EventTarget {
             case ctrl && key === "p":
                 this.dispatchEvent(new CustomEvent("skipSegment"));
                 return true;
+            case ctrl && key === "x":
+                this.dispatchEvent(new CustomEvent("skipItem"));
+                return true;
             }
         })();
 

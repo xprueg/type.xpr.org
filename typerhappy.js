@@ -89,6 +89,7 @@ void new class Typerhappy {
         });
 
         this.shortcuts.addEventListener("skipSegment", () => this.typer.skipSegment());
+        this.shortcuts.addEventListener("skipItem", () => this.typer.forceFinish());
     }
 
     async loadRandomItem() {
