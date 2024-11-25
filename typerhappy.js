@@ -93,21 +93,15 @@ void new class Typerhappy {
     }
 
     async loadRandomItem() {
-        this.LoadingSpinner.showWhile(async () => {
-            const random_item = await this.sources.activeItem.random();
-            this.current_item = random_item;
-
-            this.typer.set_text(this.current_item.textSanitized);
-        });
+        this.LoadingSpinner
+            .showWhile(async () => this.current_item = await this.sources.activeItem.random())
+            .then(() => this.typer.set_text(this.current_item.textSanitized));
     }
 
     async handleRelatedSelection(id) {
-        this.LoadingSpinner.showWhile(async () => {
-            const item = await this.sources.activeItem.fetch({ id })
-            this.current_item = item
-
-            this.typer.set_text(this.current_item.textSanitized)
-        });
+        this.LoadingSpinner
+            .showWhile(async () => this.current_item = await this.sources.activeItem.fetch({ id }))
+            .then(() => this.typer.set_text(this.current_item.textSanitized));
     }
 
     async handleNext() {
