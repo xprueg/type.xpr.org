@@ -47,29 +47,24 @@ export default class RelatedSelection extends EventTarget {
     }
 
     set_options(options) {
-        const form = this.form = document.createElement("form")
-        form.id = "RelatedItems"
-        
-        const span = document.createElement("span")
-        span.id = "related_items_header"
-        span.textContent = "UP NEXT"
-        form.append(span)
+        this.form = this.node.appendChild(document.createElement("form"));
+            this.form.id = "RelatedItems";
+            const span = this.form.appendChild(document.createElement("span"));
+                span.id = "related_items_header";
+                span.textContent = "UP NEXT";
 
         for (let i = 0; i < options.length; ++i) {
-            const label = document.createElement("label") 
-            label.textContent = options.at(i).title
-            form.append(label)
-
-            const input = document.createElement("input")
-            input.type = "radio"
-            input.name = "related_selection"
-            input.value = options.at(i).id
-            input.checked = i === 0
-            label.append(input)
+            const label = this.form.appendChild(document.createElement("label"));
+                const input = label.appendChild(document.createElement("input"));
+                    input.type = "radio";
+                    input.name = "related_selection";
+                    input.value = options.at(i).id;
+                    input.checked = i === 0;
+                const span = label.appendChild(document.createElement("span"));
+                    span.textContent = options.at(i).title;
         }
 
-        this.node.append(form)
-        form.elements[0].focus()
+        this.form.elements[0].focus();
     }
 
     clear(options) {

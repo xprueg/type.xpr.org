@@ -4,6 +4,9 @@ const fontFaces = {
     "Cartograph": "/fonts/cartograph/CartographCF-LightItalic.woff2",
     "GT America": "/fonts/gt_america/GT-America-LC-Expanded-Regular.woff2",
     "Cordata": "/fonts/WebPlus_Cordata_PPC-400.woff",
+    "ABC Social": "/fonts/abc_social/ABCSocialCyrillicExtended-Regular-Trial.woff2",
+    "Lausanne": "/fonts/twk_lausanne/TWKLausanne-300.woff2",
+    "Suisse": "/fonts/swiss_suisse/SuisseIntl-Light-WebTrial.woff2",
 };
 
 export default class ThemeMenu extends MenuItem {
@@ -11,8 +14,8 @@ export default class ThemeMenu extends MenuItem {
     key = "theme";
 
     items = [
-        { key: "alpha", name: "Alpha" },
         { key: "zensur", name: "Zensur" },
+        { key: "alpha", name: "Alpha" },
         { key: "terminal", name: "Terminal" },
     ];
 
