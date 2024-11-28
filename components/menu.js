@@ -1,5 +1,7 @@
 import MenuItem from "./menu/menuItem.js";
 
+// TODO Separate menu items by settings and actions
+
 export default class Menu extends MenuItem {
     menu = new class extends MenuItem {
         name = "Settings";
@@ -49,7 +51,7 @@ export default class Menu extends MenuItem {
     }
 
     updateStatus() {
-        this.liveStatus.textContent = this.menu.items.map(item => String(item)).join(" · ");
+        this.liveStatus.textContent = this.menu.items.map(item => String(item)).filter(s => s.length).join(" · ");
     }
 
 
@@ -115,6 +117,9 @@ export default class Menu extends MenuItem {
                 if (name !== "settings")
                     localStorage.setItem(name, value);
 
+                // FIXME There should be only one way of dispatching events.
+                //       If an event needs to be captured it likely should be listend
+                //       to on the actual menu item.
                 this.activeMenu?.onChange?.(value, "capturing");
                 this.dispatchEvent(new CustomEvent("settingChanged", { detail: {
                     key: this.activeMenu?.key,

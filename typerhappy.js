@@ -1,5 +1,6 @@
 import Menu from "./components/menu.js"
 import Themes from "./components/menu/theme.js"
+import Actions from "./components/menu/actions.js"
 import SourceMenu from "./components/menu/source.js"
 import Typer from "./components/typer.js"
 import LoadingSpinner from "./components/loader.js"
@@ -10,8 +11,9 @@ void new class Typerhappy {
     LoadingSpinner = new LoadingSpinner(LoaderNode);
     sources = new SourceMenu();
     themes = new Themes();
+    actions = new Actions();
     shortcuts = new Shortcuts();
-    menu = new Menu(MenuNode, { items: [ this.sources, this.themes ] });
+    menu = new Menu(MenuNode, { items: [ this.sources, this.themes, this.actions ] });
     typer = new Typer(TyperNode);
     relatedSelection = new RelatedSelection(RelatedSelectionNode);
 
@@ -61,8 +63,21 @@ void new class Typerhappy {
             this.typer.handleStyleChange();
         });
 
-        this.menu.addEventListener("deferredSettingChanged", e => {
+        this.menu.addEventListener("settingChanged", e => {
             const { key, value } = e.detail;
+
+            switch (key) {
+            case "actions":
+                switch (value) {
+                case "skip_segment":
+                    return this.typer.skipSegment();
+                case "skip_item":
+                    return this.typer.forceFinish();
+                }
+            }
+        });
+        this.menu.addEventListener("deferredSettingChanged", e => {
+            const { key } = e.detail;
 
             switch (key) {
             case "source":
