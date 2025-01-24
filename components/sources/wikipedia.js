@@ -3,21 +3,20 @@
     "title": "Not found.",
 } */
 
-import MenuItem from "../menu/menuItem.js";
+import { StatePopupMenu, MenuOption } from "../menu/menuItem.js";
 import SourceItem from "./sourceItem.js"
 
-export default class Wikipedia extends MenuItem {
-    name = "Wikipedia";
-    key = "wikipedia";
-
-    items =  [
-        { key: "de", name: "De" },
-        { key: "en", name: "En" },
-        { key: "ru", name: "Ru" },
+export default class Wikipedia extends StatePopupMenu {
+    label = "Wikipedia";
+    id = "wikipedia";
+    subMenus =  [
+        new MenuOption("De", "de"),
+        new MenuOption("En", "en"),
+        new MenuOption("Ru", "ru"),
     ];
 
-    toString() {
-        return `${this.name} (${this.activeItem.name})`; 
+    get liveStatus() {
+        return `${this.label} (${this.selected.label})`; 
     }
 
     #relatedCache = new Map();
@@ -41,7 +40,7 @@ export default class Wikipedia extends MenuItem {
     }
 
     async random(article_url) {
-        let url = `https://${this.activeItem.key}.wikipedia.org/api/rest_v1/page/random/summary`;
+        let url = `https://${this.selected.id}.wikipedia.org/api/rest_v1/page/random/summary`;
         if (article_url) {
             url = article_url.replace(
                 new RegExp(String.raw`(https://[a-z]{2}.wikipedia.org)/wiki/(.+)`),

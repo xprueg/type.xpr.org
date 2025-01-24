@@ -1,19 +1,25 @@
-import MenuItem from "./menuItem.js";
+import { StatePopupMenu, MenuOption } from "./menuItem.js";
 import Hackernews from "../sources/hackernews.js"
 import Wikipedia from "../sources/wikipedia.js"
 
-export default class SourceMenu extends MenuItem {
-    name = "Source";
-    key = "source";
+export default class SourceMenu extends StatePopupMenu {
+    label = "Source";
+    id = "source";
+    subMenus = [
+        new Hackernews(),
+        new Wikipedia(),
+    ];
 
-    items = [ Wikipedia, Hackernews ].map(source => new source());
+    get liveStatus() {
+        return this.selected.liveStatus;
+    }
 
     maybeLoadUrl(url) {
-        for (const source of this.items) {
+        for (const source of this.subMenus) {
             if (!source.acceptUrl(url))
                 continue;
 
-            this.setActiveItem(source.key);
+            this.selected = source;
             return source.fetchUrl(url);
         }
         return false;

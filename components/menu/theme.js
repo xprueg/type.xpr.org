@@ -1,4 +1,4 @@
-import MenuItem from "./menuItem.js";
+import { StatePopupMenu, MenuOption } from "./menuItem.js";
 
 const fontFaces = {
     "Cartograph": "/fonts/cartograph/CartographCF-LightItalic.woff2",
@@ -9,20 +9,19 @@ const fontFaces = {
     "Suisse": "/fonts/swiss_suisse/SuisseIntl-Light-WebTrial.woff2",
 };
 
-export default class ThemeMenu extends MenuItem {
-    name = "Theme";
-    key = "theme";
+export default new class ThemeMenu extends StatePopupMenu {
+    #cache = new Map();
 
-    items = [
-        { key: "zensur", name: "Zensur" },
-        { key: "alpha", name: "Alpha" },
-        { key: "terminal", name: "Terminal" },
+    label = "Themes";
+    id = "themes";
+    subMenus = [
+        new MenuOption("Zensur", "zensur"),
+        new MenuOption("Alpha", "alpha"),
+        new MenuOption("Terminal", "terminal"),
     ];
 
-    cache = new Map();
-
-    constructor() {
-        super();
+    constructor(...args) {
+        super(...args);
 
         this.link = document.createElement("link");
         this.link.rel = "stylesheet";
@@ -32,22 +31,25 @@ export default class ThemeMenu extends MenuItem {
         this.preloadLink.rel = "stylesheet";
         document.head.append(this.preloadLink);
 
-        this.setTheme(this.activeItem.key);
+        this.loadTheme(this.selected.id);
+        this.addEventListener("input", async _ => {
+            this.dispatchEvent(new CustomEvent("beforethemechange"));
+            this.selected = this.focused;
+            await this.loadTheme(this.selected.id);
+            this.dispatchEvent(new CustomEvent("themechange"));
+        });
+    }
+
+    get liveStatus() {
+        return this.selected.label;
     }
 
     get loaded() {
-        return this.cache.get(this.activeItem.key)
-    }
-
-    async onInput(theme) {
-        this.dispatchEvent(new Event("changestart"));
-        super.onChange(theme);
-        await this.setTheme(theme);
-        this.dispatchEvent(new Event("change"));
+        return this.#cache.get(this.selected.id);
     }
 
     // FIXME Abort all loads if another theme is set while loading.
-    setTheme(theme) {
+    async loadTheme(theme) {
         const loader = new Promise(async loaded => {
             // Load CSS
             await new Promise(res => {
@@ -86,8 +88,8 @@ export default class ThemeMenu extends MenuItem {
             loaded();
         })
 
-        this.cache.set(theme, loader);
+        this.#cache.set(theme, loader);
 
         return loader;
     }
-}
+};

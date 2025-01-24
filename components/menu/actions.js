@@ -1,15 +1,17 @@
-import MenuItem from "./menuItem.js";
+import { PopupMenu, MenuOption } from "./menuItem.js";
 
-export default class Actions extends MenuItem {
-    name = "Actions";
-    key = "actions";
-
-    toString() {
-        return String();
-    }
-
-    items = [
-        { key: "skip_segment", name: "Skip Word (⌘P)" },
-        { key: "skip_item", name: "Skip Item (⌘X)" },
+export default new class Actions extends PopupMenu {
+    label = "Actions";
+    subMenus = [
+        new MenuOption("Skip Word (⌘P)", "skipSegment"),
+        new MenuOption("Skip Item (⌘X)", "skipItem"),
     ];
-}
+
+    constructor(...args) {
+        super(...args);
+
+        this.subMenus.forEach(subMenu => subMenu.addEventListener("change", evt => {
+            this.dispatchEvent(new CustomEvent("action", { detail: subMenu.id }));
+        }));
+    }
+};

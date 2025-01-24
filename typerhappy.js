@@ -1,4 +1,5 @@
-import Menu from "./components/menu.js"
+import { PopupMenu } from "./components/menu/menuItem.js"
+import { Menu } from "./components/menu.js"
 import Themes from "./components/menu/theme.js"
 import Actions from "./components/menu/actions.js"
 import SourceMenu from "./components/menu/source.js"
@@ -10,10 +11,16 @@ import Shortcuts from "./components/Shortcuts.js"
 void new class Typerhappy {
     LoadingSpinner = new LoadingSpinner(LoaderNode);
     sources = new SourceMenu();
-    themes = new Themes();
-    actions = new Actions();
+    themes = Themes;
+    actions = Actions;
     shortcuts = new Shortcuts();
-    menu = new Menu(MenuNode, { items: [ this.sources, this.themes, this.actions ] });
+
+    menu = new Menu(MenuNode, PopupMenu.init("Settings", [
+        this.themes,
+        this.sources,
+        this.actions,
+    ]));
+
     typer = new Typer(TyperNode);
     relatedSelection = new RelatedSelection(RelatedSelectionNode);
 
@@ -23,7 +30,7 @@ void new class Typerhappy {
         const keydownChain = [ this.menu, this.shortcuts, this.typer, this.relatedSelection ];
         document.body.addEventListener("keydown", evt => {
             for (let k of keydownChain)
-                if (k.handleKeydown(evt))
+                if (k.handleKeydown(evt) === true)
                     break;
         });
 
@@ -35,7 +42,7 @@ void new class Typerhappy {
             this.LoadingSpinner.showWhile(async () => {
                 const item = await this.sources.maybeLoadUrl(predefinedUrlFromHash);
                 if (item === false) {
-                    const random_item = await this.sources.activeItem.random();
+                    const random_item = await this.sources.selected.random();
                     this.current_item = random_item;
                     this.typer.set_text(this.current_item.textSanitized);
                 } else {
@@ -49,42 +56,30 @@ void new class Typerhappy {
     }
 
     addListener() {
-        this.themes.addEventListener("changestart", () => {
+        this.themes.addEventListener("beforethemechange", () => {
             // FIXME Add fn to typer to handle hide/show.
             this.typer.node.style.display = "none";
             this.LoadingSpinner.show();
         });
-
-        this.themes.addEventListener("change", () => {
+        this.themes.addEventListener("themechange", () => {
             this.typer.node.style.removeProperty("display");
             this.LoadingSpinner.hide();
-
             this.LoadingSpinner.applySettings();
             this.typer.handleStyleChange();
         });
 
-        this.menu.addEventListener("settingChanged", e => {
-            const { key, value } = e.detail;
-
-            switch (key) {
-            case "actions":
-                switch (value) {
-                case "skip_segment":
-                    return this.typer.skipSegment();
-                case "skip_item":
-                    return this.typer.forceFinish();
-                }
+        this.actions.addEventListener("action", ({ detail: action }) => {
+            switch (action) {
+            case "skipSegment":
+                return this.typer.skipSegment();
+            case "skipItem":
+                return this.typer.forceFinish();
             }
         });
-        this.menu.addEventListener("deferredSettingChanged", e => {
-            const { key } = e.detail;
 
-            switch (key) {
-            case "source":
-                this.typer.clear();
-                this.loadRandomItem();
-                break;
-            }
+        this.sources.addEventListener("change", _ => {
+            this.typer.clear();
+            this.loadRandomItem();
         });
 
         this.typer.addEventListener("filter", e => {
@@ -109,19 +104,19 @@ void new class Typerhappy {
 
     async loadRandomItem() {
         this.LoadingSpinner
-            .showWhile(async () => this.current_item = await this.sources.activeItem.random())
+            .showWhile(async () => this.current_item = await this.sources.selected.random())
             .then(() => this.typer.set_text(this.current_item.textSanitized));
     }
 
     async handleRelatedSelection(id) {
         this.LoadingSpinner
-            .showWhile(async () => this.current_item = await this.sources.activeItem.fetch({ id }))
+            .showWhile(async () => this.current_item = await this.sources.selected.fetch({ id }))
             .then(() => this.typer.set_text(this.current_item.textSanitized));
     }
 
     async handleNext() {
         this.LoadingSpinner.showWhile(async () => {
-            const options = this.options = await this.sources.activeItem.getRelated(this.current_item);
+            const options = this.options = await this.sources.selected.getRelated(this.current_item);
             this.relatedSelection.set_options(options);
         });
     }

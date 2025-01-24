@@ -1,17 +1,16 @@
-import MenuItem from "../menu/menuItem.js";
+import { StatePopupMenu, MenuOption } from "../menu/menuItem.js";
 import SourceItem from "./sourceItem.js"
 
-export default class Hackernews extends MenuItem {
-    name = "Hackernews";
-    key = "hackernews";
-
-    items = [
-        { key: "story", name: "Story" },
-        { key: "comment", name: "Comment" },
+export default class Hackernews extends StatePopupMenu {
+    label = "Hackernews";
+    id = "hackernews";
+    subMenus = [
+        new MenuOption("Story", "story"),
+        new MenuOption("Comment", "comment"),
     ];
 
-    toString() {
-        return `${this.name} (${this.activeItem.name})`;
+    get liveStatus() {
+        return `${this.label} ${this.selected.label}`;
     }
 
     #maxId = false;

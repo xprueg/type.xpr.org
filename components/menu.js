@@ -1,179 +1,111 @@
-import MenuItem from "./menu/menuItem.js";
+import { PopupMenu, StatePopupMenu, MenuOption } from "./menu/menuItem.js";
 
-// TODO Separate menu items by settings and actions
+export class Menu {
+    openStack = [];
 
-export default class Menu extends MenuItem {
-    menu = new class extends MenuItem {
-        name = "Settings";
-        key = "settings";
-        items = null;
-    };
-
-    stack = Array();
-    get isActive() { return this.stack.length > 0 };
-
-    constructor(target, { items }) {
-        super();
-
-        this.target = target
-        this.menu.items = items;
-
-        // FIXME Events should bubble from inner menu items somehow
-        const listen = base => {
-            if (Object.hasOwn(base, "items") === false)
-                return;
-
-            for (const item of base.items) {
-                if (item instanceof EventTarget)
-                    item.addEventListener("change", e => this.updateStatus());
-                listen(item);
-            }
-        };
-        listen(this.menu);
-
+    constructor(target, menu) {
+        this.target = target;
+        this.menu = menu;
         this.render();
-        this.updateStatus();
-    }
-
-    get activeMenu() {
-        return this.stack.at(-1);
-    }
-
-    activate() {
-        this.pushMenu(this.menu);
     }
 
     render() {
         const menu = this.target.appendChild(document.createElement("menu"));
             menu.appendChild(document.createElement("li"))
-                .setHTMLUnsafe(`<span>Settings</span><span class="esc">(esc)</span>`);
+                .setHTMLUnsafe(`<span>Settings (ESC)`);
             this.liveStatus = menu.appendChild(document.createElement("li"));
+
+        this.renderLiveStatus();
     }
 
-    updateStatus() {
-        this.liveStatus.textContent = this.menu.items.map(item => String(item)).filter(s => s.length).join(" · ");
+    renderLiveStatus() {
+        this.liveStatus.textContent = this.menu.subMenus
+                                          .filter(subMenu => subMenu.liveStatus)
+                                          .map(subMenu => subMenu.liveStatus)
+                                          .join("; ");
     }
 
-
-    renderMenu(menu) {
-        const form = menu.form = document.createElement("form");
-
-        for (const item of menu.items) {
-            const label = form.appendChild(document.createElement("label"));
-                label.appendChild(document.createTextNode(item.name));
-                const input = label.appendChild(document.createElement("input"));
-                    input.checked = menu.activeItem === item;
-                    input.type = "radio";
-                    input.name = menu.key;
-                    input.value = item.key;
-        }
-
-        return form;
+    openMenu() {
+        this.pushMenu(this.menu);
     }
 
     pushMenu(menu) {
-        this.target.append(this.renderMenu(menu));
-        menu.form.querySelector("*:checked").focus();
-        this.stack.push(menu);
+        this.openStack.push(menu);
+        this.target.append(menu.render());
+        menu.focus();
     }
 
     popMenu() {
-        const poppedMenu = this.stack.pop();
-        poppedMenu.form.remove();
-        delete poppedMenu.form;
-
-        if (this.stack.length > 1)
-            this.activeMenu.form.querySelector("*:checked").focus();
+        const poppedMenu = this.openStack.pop();
+        poppedMenu.close();
+        this.activeMenu?.focus();
     }
 
-    deactivate() {
-        document.activeElement.blur();
-        while (this.stack.length !== 0) this.popMenu();
+    closeMenu({ bubbles }) {
+        while (this.openStack.length !== 0) {
+            if (bubbles === true)
+                this.activeMenu.dispatchEvent(new Event("change"));
+            this.popMenu();
+        }
+
+        this.renderLiveStatus();
+    }
+
+    get isOpen() {
+        return this.openStack.length > 0;
+    }
+
+    get activeMenu() {
+        return this.openStack.at(-1);
     }
 
     handleKeydown(evt) {
+        const target = evt.target;
+        const subMenu = target.subMenu;
         const char = evt.key;
         const ctrl = evt.ctrlKey;
         const meta = evt.metaKey;
 
-        if (char === "Escape")
-            if (this.isActive) this.deactivate();
-            else this.activate();
+        if (char === "Escape") {
+            if (this.isOpen) this.closeMenu({ bubbles: false });
+            else this.openMenu();
+            return true;
+        }
 
-        if (!this.isActive)
+        if (!this.isOpen)
             return false;
 
         if (char === "Backspace") {
             this.popMenu();
-            if (!this.isActive) this.deactivate();
             return true;
         }
 
-        if (this.target.contains(evt.target)) {
-            const name = evt.target.name;
-            const value = evt.target.value;
-            
-            if (char === "Enter") {
-                if (name !== "settings")
-                    localStorage.setItem(name, value);
+        if (char === "Enter") {
+            this.activeMenu.selectOption();
 
-                // FIXME There should be only one way of dispatching events.
-                //       If an event needs to be captured it likely should be listend
-                //       to on the actual menu item.
-                this.activeMenu?.onChange?.(value, "capturing");
-                this.dispatchEvent(new CustomEvent("settingChanged", { detail: {
-                    key: this.activeMenu?.key,
-                    value,
-                }}));
-
-                const menuItem = this.activeMenu.items.find(item => item.key === value);
-                const menuItemHasSubMenu = "items" in menuItem;
-                if (menuItemHasSubMenu) {
-                    const subMenu = this.activeMenu.items.find(item => item.key === value);
-                    this.pushMenu(subMenu);
-                    return true;
-                }
-
-                this.stack.reverse().forEach(menu => {
-                    menu?.onChange?.(menu.activeItem.key, "bubbling");
-                    this.dispatchEvent(new CustomEvent("deferredSettingChanged", { detail: {
-                        key: menu.activeItem.key,
-                    }}));
-                });
-
-                this.deactivate();
-                return true;
+            if (subMenu instanceof PopupMenu) {
+                this.pushMenu(subMenu);
+            } else if (subMenu instanceof MenuOption) {
+                subMenu.dispatchEvent(new Event("change"));
+                this.closeMenu({ bubbles: true });
             }
+
+            return true;
         }
 
         if (/^[hjkl]|^Arrow/.test(char)) {
             evt.preventDefault();
-            const inputs = Array.from(this.activeMenu.form.elements);
-            const currentInput = inputs.findIndex(input => input.checked);
 
-            let newInput;
             switch (true) {
-                case /l|k|Arrow(Right|Down)/.test(char):
-                   newInput = inputs.at(currentInput + 1 >= inputs.length ? 0 : currentInput + 1);
-                   break;
-                case /h|j|Arrow(Left|Up)/.test(char):
-                   newInput = inputs.at(currentInput - 1 < 0 ? -1 : currentInput - 1)
-                   break;
+            case /l|k|Arrow(Right|Down)/.test(char):
+               this.activeMenu.focusNextOption();
+               break;
+            case /h|j|Arrow(Left|Up)/.test(char):
+               this.activeMenu.focusPrevOption();
+               break;
             }
 
-            newInput.focus();
-            newInput.checked = true;
-
-            const name = newInput.name;
-            const value = newInput.value;
-
-            this.activeMenu?.onInput?.(value, name);
-            this.dispatchEvent(new CustomEvent("settingSelected", { detail: {
-                key: this.activeMenu.key,
-                value: this.activeMenu.activeItem.key,
-            } }));
-
-            return true
+            return true;
         }
     }
-}
+};

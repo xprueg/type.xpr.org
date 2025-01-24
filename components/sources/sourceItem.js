@@ -6,7 +6,7 @@ export default class SourceItem {
     #author;
 
     constructor(item) {
-        Object.assign(this, item) 
+        Object.assign(this, item);
     }
 
     get textSanitized() {
@@ -15,6 +15,6 @@ export default class SourceItem {
             .map(c => c.textContent)
             .join("\x20")
             .replace(/\s+/g, "\x20")
-            .trim()
+            .trim();
     }
 }
